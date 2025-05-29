@@ -70,6 +70,8 @@
 
       <div id="result"></div>
 
+      <br>
+
     </div>
 
   </div>
@@ -180,15 +182,19 @@ function getPerformanceCategory(score) {
   return "Starter Level";
 }
   
-    // ✅ Declare globally so it persists across chart updates
-    let gaugeChart; // Declare outside the function to persist
+   let gaugeChart;
 
-    function renderGauge(score) {
+function renderGauge(score) {
   const gaugeWrapper = document.getElementById('gaugeWrapper');
-  const ctx = document.getElementById('scoreGauge').getContext('2d');
+  const canvas = document.getElementById('scoreGauge');
+  const ctx = canvas.getContext('2d');
 
   // Show the gauge wrapper if hidden
   gaugeWrapper.style.display = 'block';
+
+  // ✅ Force canvas size manually every time
+  canvas.width = 200;
+  canvas.height = 200;
 
   // Destroy existing chart to redraw
   if (gaugeChart) {
@@ -199,8 +205,7 @@ function getPerformanceCategory(score) {
     datasets: [{
       data: [score, 100 - score],
       backgroundColor: [
-        score >= 60 ? '#02CFB0' :
-        '#FF9F01',
+        score >= 60 ? '#02CFB0' : '#FF9F01',
         '#2C233D'
       ],
       borderWidth: 0,
@@ -210,13 +215,10 @@ function getPerformanceCategory(score) {
     }]
   };
 
-  
-
   const centerTextPlugin = {
     id: 'centerText',
     beforeDraw: chart => {
-      const { width } = chart;
-      const { height } = chart;
+      const { width, height } = chart;
       const ctx = chart.ctx;
       ctx.restore();
 
@@ -225,7 +227,7 @@ function getPerformanceCategory(score) {
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(`${score.toFixed(1)}`, width / 2, height / 1.4); // Adjust height ratio for vertical placement
+      ctx.fillText(`${score.toFixed(1)}`, width / 2, height / 1.4);
 
       ctx.save();
     }
@@ -233,7 +235,7 @@ function getPerformanceCategory(score) {
 
   const config = {
     type: 'doughnut',
-    data: data,
+    data,
     options: {
       responsive: false,
       maintainAspectRatio: false,
@@ -280,8 +282,8 @@ const standardSeconds = timeToSeconds(courseRecord);
   const category = getPerformanceCategory(score);
 
   resultDiv.innerHTML = `
-    <p>Your age-graded score: <strong>${score.toFixed(2)}%</strong></p>
-    <p>Performance level: <strong>${category}</strong></p>
+    <p>Your age-graded score: <strong>${score.toFixed(1)}%</strong></p>
+    <p><strong>${category}</strong></p>
   `;
 
   document.getElementById('summary').innerHTML = 
@@ -306,7 +308,7 @@ if (nextLevel) {
   const seconds = Math.round(targetSeconds % 60);
   const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
   resultDiv.innerHTML += `
-    <p>To reach <strong>${getPerformanceCategory(nextLevel)}</strong> (${nextLevel}%), you'd need to record <strong>${formatted}</strong></p>
+    <p>To reach <strong>${getPerformanceCategory(nextLevel)}</strong> (${nextLevel}%), you'd need to record a time of <strong>${formatted}</strong></p>
   `;
 }
 

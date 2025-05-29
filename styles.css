@@ -77,7 +77,7 @@ border: solid 2px #e78e00;
     padding: 10px 20px;
     background: #FF9F01;
     color: #221b2f;
-    font-weight: 700;
+    font-weight: bold;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -85,7 +85,8 @@ border: solid 2px #e78e00;
   }
 
   button:hover  {
-    background-color: #e78e00;
+    background-color: #02CFB0;
+    transform: scale(1.1);
   }
   
 
@@ -97,15 +98,15 @@ border: solid 2px #e78e00;
   }
 
   #result {
-    margin-top: 20px;
+
     font-weight: bold;
   }
 
   .extra    {
     background-color: #221b2f;
-    padding: 20px;
+    padding: 20px 50px;
     margin-top: 20px;
-    border-radius: 10px;
+    border-radius: 5px;
     text-align: center;
 
   }
