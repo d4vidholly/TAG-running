@@ -135,3 +135,58 @@ border: solid 2px #e78e00;
     padding: 0 20px;
   }
 
+  @media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+
+  .logo {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  input,
+  button,
+  #course {
+    width: 100%;
+    max-width: 100%;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+
+  .input-wrapper {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+
+  #scoreGauge {
+    width: 100%;
+    max-width: 200px;
+    height: auto;
+  }
+
+  #result {
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  .extra {
+    width: 100%;
+    padding: 15px;
+    box-sizing: border-box;
+  }
+
+  .gender-toggle label {
+    margin: 5px 3px;
+    font-size: 0.9rem;
+  }
+}
+
