@@ -141,7 +141,7 @@ border: solid 2px #e78e00;
   }
 
   .container {
-    width: 100%;
+    width: 90vw;
     padding: 15px;
     box-sizing: border-box;
   }
