@@ -1,0 +1,137 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #221b2f;
+    padding: 40px;
+  }
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 400px;
+    background: #2C233D;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    border: solid 4px #e78e00;
+  }
+
+.logo {
+  max-width: 440px;
+  width: 380px;
+  padding: 20px;
+}
+
+.description  {
+  font-size: smaller;
+}
+
+  #course {
+padding: 15px;
+border-radius: 5px;
+background-color: #2C233D;
+color: white;
+border: solid 2px #e78e00;
+font-weight: 700;
+  }
+
+  #timeInput:focus  {
+    background-color: #e78e00;
+    color: #2C233D;
+    font-weight: 700;
+  }
+  
+  input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px #221b2f inset !important;
+  -webkit-text-fill-color: white !important;
+}
+  
+  input {
+    width: 200px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    background-color: #221b2f;
+    color: white;
+    border: none;
+    align-items: center;
+    text-align: center;
+  }
+
+  .input-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+border: solid 2px #e78e00;
+    padding: 0 50px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background: #FF9F01;
+    color: #221b2f;
+    font-weight: 700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+  }
+
+  button:hover  {
+    background-color: #e78e00;
+  }
+  
+
+#scoreGauge {
+    display: block;
+    margin: 0 auto;
+    width: 200px;
+    height: 200px;
+  }
+
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+  }
+
+  .extra    {
+    background-color: #221b2f;
+    padding: 20px;
+    margin-top: 20px;
+    border-radius: 10px;
+    text-align: center;
+
+  }
+
+  .gender-toggle label {
+    display: inline-block;
+    padding: 0.5em 1em;
+    margin: 0 0.5em 0 0;
+    border-radius: 6px;
+    background-color: #FF9F01;
+    cursor: pointer;
+    font-weight: bold;
+    color: #835100;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+  
+  .gender-toggle input[type="radio"] {
+    display: none;
+  }
+  
+  .gender-toggle input[type="radio"]:checked + span,
+  .gender-toggle label input[type="radio"]:checked + span {
+    color: #221b2f;
+  }
+
+  #result   {
+    padding: 0 20px;
+  }
+

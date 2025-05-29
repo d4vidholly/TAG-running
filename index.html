@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TAG Running</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+
+
+    <img class="logo" src="logo.svg">
+
+    <p class="description">True Age Grading allows you to compare age graded results specific to your Parkrun course, rather than global records.</p>
+
+
+      <label for="course"><br>
+    <select id="course">
+      <option value="studley">Studley Parkrun</option>
+      <option value="herringtoncountry">Herrington Country Parkrun</option>
+      <option value="silksworth">Silksworth Parkrun</option>
+      <option value="reigatepriory">Reigate Priory Parkrun</option>
+    </select>
+  </label>
+  <br>
+  <br>
+
+    <div class="input-wrapper">
+    
+    <p class="gender-toggle">
+        Gender:<br><br>
+        <label>
+          <input type="radio" name="gender" value="Male" checked><span>Male</span>
+        </label>
+        <label>
+          <input type="radio" name="gender" value="Female"><span>Female</span>
+        </label>
+      </p>
+    
+    <p>
+        <label>Age:<br>
+            <input type="number" id="age" value="32" min="15" max="59">
+          </label>
+    </p>
+
+    <p>
+        <label for="timeInput">5K Result (MM:SS):<br></label>
+        <input type="text" id="timeInput" placeholder="e.g. 20:00">
+      </p>
+
+    </div>
+      
+      <button onclick="calculateScore()">Calculate Score</button>
+      
+      <div class="extra" style="display: none;">
+
+      <p><b>TAG Result</b></p>
+
+      <br>
+
+  <p id="summary"></p>
+
+      <div id="gaugeWrapper" style="display: none;">
+
+      <canvas id="scoreGauge"></canvas>
+  
+      </div>
+
+      <div id="result"></div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const ageGroupStandards = {
+      studley: {
+      "11-14": { "Male": "17:32", "Female": "20:14" },
+      "15-17": { "Male": "17:18", "Female": "" },
+      "18-19": { "Male": "16:26", "Female": "" },
+      "20-24": { "Male": "16:28", "Female": "19:15" },
+      "25-29": { "Male": "16:32", "Female": "19:05" },
+      "30-34": { "Male": "16:29", "Female": "18:40" },
+      "35-39": { "Male": "16:44", "Female": "19:45" },
+      "40-44": { "Male": "17:38", "Female": "19:26" },
+      "45-49": { "Male": "", "Female": "20:15" },
+      "50-54": { "Male": "", "Female": "" },
+      "55-59": { "Male": "", "Female": "20:15" }
+      },
+      herringtoncountry: {
+      "11-14": { "Male": "17:30", "Female": "21:04" },
+      "15-17": { "Male": "16:43", "Female": "20:24" },
+      "18-19": { "Male": "16:49", "Female": "19:59" },
+      "20-24": { "Male": "16:08", "Female": "19:31" },
+      "25-29": { "Male": "16:10", "Female": "18:42" },
+      "30-34": { "Male": "16:01", "Female": "18:19" },
+      "35-39": { "Male": "16:44", "Female": "19:32" },
+      "40-44": { "Male": "16:53", "Female": "18:49" },
+      "45-49": { "Male": "17:28", "Female": "20:07" },
+      "50-54": { "Male": "", "Female": "20:07" },
+      "55-59": { "Male": "", "Female": "20:46" }
+      },
+         silksworth: {
+      "11-14": { "Male": "", "Female": "19:05" },
+      "15-17": { "Male": "16:31", "Female": "18:56" },
+      "18-19": { "Male": "16:34", "Female": "18:48" },
+      "20-24": { "Male": "15:56", "Female": "18:41" },
+      "25-29": { "Male": "15:26", "Female": "18:26" },
+      "30-34": { "Male": "15:43", "Female": "16:46" },
+      "35-39": { "Male": "15:53", "Female": "16:55" },
+      "40-44": { "Male": "15:40", "Female": "17:21" },
+      "45-49": { "Male": "16:38", "Female": "18:46" },
+      "50-54": { "Male": "16:43", "Female": "" },
+      "55-59": { "Male": "", "Female": "19:48" }
+      },
+         reigatepriory: {
+      "11-14": { "Male": "17:16", "Female": "" },
+      "15-17": { "Male": "16:23", "Female": "" },
+      "18-19": { "Male": "16:11", "Female": "" },
+      "20-24": { "Male": "15:54", "Female": "" },
+      "25-29": { "Male": "15:44", "Female": "" },
+      "30-34": { "Male": "16:45", "Female": "" },
+      "35-39": { "Male": "15:37", "Female": "" },
+      "40-44": { "Male": "16:46", "Female": "" },
+      "45-49": { "Male": "17:04", "Female": "" },
+      "50-54": { "Male": "", "Female": "" },
+      "55-59": { "Male": "", "Female": "" }
+      }
+
+    };
+
+    document.getElementById('timeInput').addEventListener('input', function (e) {
+  let value = e.target.value.replace(/[^0-9]/g, ''); // Remove non-digits
+  if (value.length > 4) value = value.slice(0, 4);   // Max 4 digits (MMSS)
+
+  if (value.length >= 3) {
+    e.target.value = value.slice(0, value.length - 2) + ':' + value.slice(-2);
+  } else if (value.length >= 1) {
+    e.target.value = value;
+  }
+});
+  
+    function timeToSeconds(timeStr) {
+      const parts = timeStr.split(":").map(Number);
+      if (parts.length === 2) {
+        return parts[0] * 60 + parts[1]; // MM:SS
+      } else if (parts.length === 3) {
+        return parts[0] * 3600 + parts[1] * 60 + parts[2]; // HH:MM:SS
+      }
+      return 0;
+    }
+  
+    function getAgeGroup(age) {
+  if (age >= 11 && age <= 14) return "11-14";
+  if (age >= 15 && age <= 17) return "15-17";
+  if (age >= 18 && age <= 19) return "18-19";
+  if (age >= 20 && age <= 24) return "20-24";
+  if (age >= 25 && age <= 29) return "25-29";
+  if (age >= 30 && age <= 34) return "30-34";
+  if (age >= 35 && age <= 39) return "35-39";
+  if (age >= 40 && age <= 44) return "40-44";
+  if (age >= 45 && age <= 49) return "45-49";
+  if (age >= 50 && age <= 54) return "50-54";
+  if (age >= 55 && age <= 59) return "55-59";
+  return null; // Age not supported
+}
+  
+function getPerformanceCategory(score) {
+  if (score >= 100) return "World Record Class";
+  if (score >= 90) return "World Class";
+  if (score >= 80) return "National Class";
+  if (score >= 70) return "Regional Class";
+  if (score >= 60) return "Local Class";
+  if (score >= 50) return "Advanced Level";
+  if (score >= 40) return "Intermediate Level";
+  if (score >= 30) return "Developing Level";
+  if (score >= 20) return "Foundation Level";
+  return "Starter Level";
+}
+  
+    // ✅ Declare globally so it persists across chart updates
+    let gaugeChart; // Declare outside the function to persist
+
+    function renderGauge(score) {
+  const gaugeWrapper = document.getElementById('gaugeWrapper');
+  const ctx = document.getElementById('scoreGauge').getContext('2d');
+
+  // Show the gauge wrapper if hidden
+  gaugeWrapper.style.display = 'block';
+
+  // Destroy existing chart to redraw
+  if (gaugeChart) {
+    gaugeChart.destroy();
+  }
+
+  const data = {
+    datasets: [{
+      data: [score, 100 - score],
+      backgroundColor: [
+        score >= 60 ? '#02CFB0' :
+        '#FF9F01',
+        '#2C233D'
+      ],
+      borderWidth: 0,
+      cutout: '80%',
+      circumference: 180,
+      rotation: 270
+    }]
+  };
+
+  
+
+  const centerTextPlugin = {
+    id: 'centerText',
+    beforeDraw: chart => {
+      const { width } = chart;
+      const { height } = chart;
+      const ctx = chart.ctx;
+      ctx.restore();
+
+      const fontSize = (height / 8).toFixed(2);
+      ctx.font = `${fontSize}px sans-serif`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`${score.toFixed(1)}`, width / 2, height / 1.4); // Adjust height ratio for vertical placement
+
+      ctx.save();
+    }
+  };
+
+  const config = {
+    type: 'doughnut',
+    data: data,
+    options: {
+      responsive: false,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: { enabled: false },
+        legend: { display: false }
+      }
+    },
+    plugins: [centerTextPlugin]
+  };
+
+  gaugeChart = new Chart(ctx, config);
+}
+  
+function calculateScore() {
+  const gender = document.querySelector('input[name="gender"]:checked').value;
+  const age = parseInt(document.getElementById("age").value);
+  const inputTime = document.getElementById("timeInput").value;
+  const userSeconds = timeToSeconds(inputTime);
+  const resultDiv = document.getElementById("result");
+
+const course = document.getElementById("course").value;
+const ageGroup = getAgeGroup(age);
+
+if (
+  !ageGroup ||
+  !ageGroupStandards[course] ||
+  !ageGroupStandards[course][ageGroup] ||
+  !ageGroupStandards[course][ageGroup][gender]
+) {
+  resultDiv.innerText = "Age group or course not supported for your gender.";
+  return;
+}
+
+const courseRecord = ageGroupStandards[course][ageGroup][gender];
+const standardSeconds = timeToSeconds(courseRecord);
+
+  if (!inputTime || isNaN(userSeconds) || userSeconds <= 0) {
+    resultDiv.innerText = "Please enter a valid time in MM:SS format.";
+    return;
+  }
+
+  const score = (standardSeconds / userSeconds) * 100;
+  const category = getPerformanceCategory(score);
+
+  resultDiv.innerHTML = `
+    <p>Your age-graded score: <strong>${score.toFixed(2)}%</strong></p>
+    <p>Performance level: <strong>${category}</strong></p>
+  `;
+
+  document.getElementById('summary').innerHTML = 
+  `Based on a ${age}-year-old ${gender} recording a ${inputTime} 5k at ${course.replace(/([a-z])([A-Z])/g, '$1 $2')} Parkrun`;
+
+  // Optional: target time to next level
+let nextLevel;
+if (score < 10) nextLevel = 10;
+else if (score < 20) nextLevel = 20;
+else if (score < 30) nextLevel = 30;
+else if (score < 40) nextLevel = 40;
+else if (score < 50) nextLevel = 50;
+else if (score < 60) nextLevel = 60;
+else if (score < 70) nextLevel = 70;
+else if (score < 80) nextLevel = 80;
+else if (score < 90) nextLevel = 90;
+else if (score < 100) nextLevel = 100;
+
+if (nextLevel) {
+  const targetSeconds = standardSeconds / (nextLevel / 100);
+  const minutes = Math.floor(targetSeconds / 60);
+  const seconds = Math.round(targetSeconds % 60);
+  const formatted = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  resultDiv.innerHTML += `
+    <p>To reach <strong>${getPerformanceCategory(nextLevel)}</strong> (${nextLevel}%), you'd need to record <strong>${formatted}</strong></p>
+  `;
+}
+
+  document.querySelector('.extra').style.display = 'block';
+  document.getElementById('gaugeWrapper').style.display = 'block';
+  renderGauge(score);
+}
+
+
+
+  </script>
+  
+</body>
+</html>
