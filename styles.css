@@ -42,8 +42,6 @@ font-weight: 700;
   }
 
   #timeInput:focus  {
-    background-color: #e78e00;
-    color: #2C233D;
     font-weight: 700;
   }
   
@@ -194,4 +192,9 @@ border: solid 2px #e78e00;
     font-size: 0.9rem;
   }
 }
+
+button:hover  {
+    background-color: none;
+    transform: none;
+  }
 
