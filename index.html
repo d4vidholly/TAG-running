@@ -19,6 +19,7 @@
       <label for="course"><br>
     <select id="course">
       <option value="studley">Studley Parkrun</option>
+      <option value="parkville">Parkville Parkrun</option>
       <option value="herringtoncountry">Herrington Country Parkrun</option>
       <option value="silksworth">Silksworth Parkrun</option>
       <option value="ferrymeadows">Ferry Meadows Parkrun</option>
@@ -92,7 +93,24 @@
       "40-44": { "Male": "17:38", "Female": "19:26" },
       "45-49": { "Male": "", "Female": "20:15" },
       "50-54": { "Male": "", "Female": "" },
-      "55-59": { "Male": "", "Female": "20:15" }
+      "55-59": { "Male": "", "Female": "20:15" },
+      "60-64": { "Male": "", "Female": "" },
+      "65-69": { "Male": "", "Female": "" }
+      },
+          parkville: {
+      "11-14": { "Male": "", "Female": "18:29" },
+      "15-17": { "Male": "14:58", "Female": "17:40" },
+      "18-19": { "Male": "16:02", "Female": "18:33" },
+      "20-24": { "Male": "15:37", "Female": "18:11" },
+      "25-29": { "Male": "15:23", "Female": "16:49" },
+      "30-34": { "Male": "14:56", "Female": "17:34" },
+      "35-39": { "Male": "15:32", "Female": "16:55" },
+      "40-44": { "Male": "15:52", "Female": "16:30" },
+      "45-49": { "Male": "", "Female": "18:58" },
+      "50-54": { "Male": "", "Female": "19:17" },
+      "55-59": { "Male": "", "Female": "" },
+      "60-64": { "Male": "", "Female": "" },
+      "65-69": { "Male": "", "Female": "" }
       },
       herringtoncountry: {
       "11-14": { "Male": "17:30", "Female": "21:04" },
@@ -280,27 +298,37 @@ function renderGauge(score) {
 }
   
 function calculateScore() {
-  const gender = document.querySelector('input[name="gender"]:checked').value;
+  const gender = document.querySelector('input[name="gender"]:checked')?.value;
   const age = parseInt(document.getElementById("age").value);
   const inputTime = document.getElementById("timeInput").value;
   const userSeconds = timeToSeconds(inputTime);
   const resultDiv = document.getElementById("result");
 
-const course = document.getElementById("course").value;
-const ageGroup = getAgeGroup(age);
+  const course = document.getElementById("course").value;
+  const ageGroup = getAgeGroup(age);
 
-if (
-  !ageGroup ||
-  !ageGroupStandards[course] ||
-  !ageGroupStandards[course][ageGroup] ||
-  !ageGroupStandards[course][ageGroup][gender]
-) {
-  resultDiv.innerText = "Age group or course not supported for your gender.";
-  return;
-}
+  // Check for invalid time early
+  if (!inputTime || isNaN(userSeconds) || userSeconds <= 0) {
+    alert("Please enter a valid time in MM:SS format.");
+    return;
+  }
 
-const courseRecord = ageGroupStandards[course][ageGroup][gender];
-const standardSeconds = timeToSeconds(courseRecord);
+  // Check for missing data in the course/age group/gender map
+  if (
+    !ageGroup ||
+    !ageGroupStandards[course] ||
+    !ageGroupStandards[course][ageGroup] ||
+    !ageGroupStandards[course][ageGroup][gender]
+  ) {
+    alert("Oops — we don’t have results for that age group and course combination. We’re working to expand our data!");
+    return;
+  }
+
+  // If all is good, proceed as normal
+  const courseRecord = ageGroupStandards[course][ageGroup][gender];
+  const standardSeconds = timeToSeconds(courseRecord);
+
+  // Your existing score calculation logic continues here...
 
   if (!inputTime || isNaN(userSeconds) || userSeconds <= 0) {
     resultDiv.innerText = "Please enter a valid time in MM:SS format.";
